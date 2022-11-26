@@ -98,7 +98,7 @@ const replies = [
 	"Whoever writes the most code this month gets featured on my Twitter!",
 	"QA is a waste of money. Fired.",
 	"I've laid off most of the staff, and Twitter's still running. Looks like they weren't necessary.",
-	"Send me your 10 most salient Reddit comments.",
+	"Send me your 10 most salient Discord messages.",
 	"Why are we still serving free lunch?",
 	"Twitter was never profitable. Not my fault. Stop blaming me for things.",
 	"I have made promises to the shareholders that I definitely *cannot* keep, so I need you all to work TWICE as hard!",
@@ -125,7 +125,7 @@ client.on("messageCreate", async (message) => {
 			}
 		}
 	} else {
-		if (Math.random() <= 0.2) {
+		if (Math.random() <= 0.1) {
 			await message.reply(replies[Math.floor(Math.random() * replies.length)]);
 			return;
 		}
