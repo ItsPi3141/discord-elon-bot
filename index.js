@@ -104,8 +104,31 @@ const replies = [
 	"I have made promises to the shareholders that I definitely *cannot* keep, so I need you all to work TWICE as hard!",
 	"Time is money. I want to see 100 lines written by lunchtime!"
 ];
+const greetings = [
+	"Hello!",
+	"Hi!",
+	"Hey!",
+	"Hey, that's me!",
+	"What's up?",
+	"Hello!",
+	"Hi!",
+	"Hey!",
+	"Hey, that's me!",
+	"What's up?",
+	"How are you doing?",
+	"Hey there!",
+	"How's it going?",
+	"Stop pinging me and get back to work! 100 lines of code before lunch!",
+	"Stop wasting time",
+	"How's your day?",
+	"Hi there!"
+];
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
+	if (message.content.toLowerCase().includes(`<@${client.user.id}>`)) {
+		message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
+		return;
+	}
 	if (message.mentions.users.has(client.user.id)) {
 		if (Math.random() <= 0.85) {
 			await message.reply(talkback_replies[Math.floor(Math.random() * talkback_replies.length)]);
