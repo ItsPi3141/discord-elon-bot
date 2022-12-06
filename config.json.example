@@ -1,4 +1,5 @@
 {
 	"token": "PUT YOUR BOT TOKEN HERE",
 	"id": "PUT YOUR BOT CLIENT ID HERE"
+	"huggingface_api_keys": ["key1_required", "key2_optional", "key3_optional_etc"]
 }

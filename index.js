@@ -1,6 +1,10 @@
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent] });
 const config = require("./config.json");
+const fetch = require("node-fetch");
+
+const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-small-elon";
+var api_rotation = 0;
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -125,32 +129,63 @@ const greetings = [
 ];
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
-	if (message.content.toLowerCase().includes(`<@${client.user.id}>`)) {
-		message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
-		return;
-	}
-	if (message.mentions.users.has(client.user.id)) {
-		if (Math.random() <= 0.85) {
-			await message.reply(talkback_replies[Math.floor(Math.random() * talkback_replies.length)]);
+
+	if (message.content.startsWith(".")) {
+		// form the request headers with Hugging Face API key
+		var headers = {
+			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
+		};
+
+		// set status to typing
+		message.channel.sendTyping();
+		// query the server
+		const response = await fetch(API_URL, {
+			method: "post",
+			body: message.content.replace(".", ""),
+			headers: headers
+		});
+		const data = await response.json();
+		let botResponse = "";
+		if (data.hasOwnProperty("generated_text")) {
+			botResponse = data.generated_text;
+		} else if (data.hasOwnProperty("error")) {
+			// error condition
+			botResponse = "An error has occurred!";
+			// botResponse = data.error;
 		}
+		message.reply(botResponse);
+		console.log(config.huggingface_api_keys[api_rotation]);
+		console.log(api_rotation);
+		api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
 		return;
-	}
-	if (message.content.toLowerCase().includes("twitter")) {
-		if (Math.random() <= 0.7) {
+	} else {
+		if (message.content.toLowerCase().includes(`<@${client.user.id}>`)) {
+			message.reply(greetings[Math.floor(Math.random() * greetings.length)]);
+			return;
+		}
+		if (message.mentions.users.has(client.user.id)) {
+			if (Math.random() <= 0.85) {
+				await message.reply(talkback_replies[Math.floor(Math.random() * talkback_replies.length)]);
+			}
+			return;
+		}
+		if (message.content.toLowerCase().includes("twitter")) {
 			if (Math.random() <= 0.7) {
-				await message.reply(twitter_replies[Math.floor(Math.random() * twitter_replies.length)]);
-				return;
+				if (Math.random() <= 0.7) {
+					await message.reply(twitter_replies[Math.floor(Math.random() * twitter_replies.length)]);
+					return;
+				}
+			} else {
+				if (Math.random() <= 0.7) {
+					await message.reply(replies[Math.floor(Math.random() * replies.length)]);
+					return;
+				}
 			}
 		} else {
-			if (Math.random() <= 0.7) {
+			if (Math.random() <= 0.1) {
 				await message.reply(replies[Math.floor(Math.random() * replies.length)]);
 				return;
 			}
-		}
-	} else {
-		if (Math.random() <= 0.1) {
-			await message.reply(replies[Math.floor(Math.random() * replies.length)]);
-			return;
 		}
 	}
 });
