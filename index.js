@@ -3,7 +3,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 const config = require("./config.json");
 const fetch = require("node-fetch");
 
-const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-medium-elon";
+const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-medium-elon-2";
 var api_rotation = 0;
 
 client.on("ready", () => {
@@ -150,11 +150,15 @@ client.on("messageCreate", async (message) => {
 		// set status to typing
 		message.channel.sendTyping();
 		// query the server
-		const response = await fetch(API_URL, {
-			method: "post",
-			body: message.content.replace(".", ""),
-			headers: headers
-		});
+		try {
+			const response = await fetch(API_URL, {
+				method: "post",
+				body: message.content.replace(".", ""),
+				headers: headers
+			});
+		} catch {
+			console.log("An error occurred");
+		}
 		const data = await response.json();
 		let botResponse = "";
 		if (data.hasOwnProperty("generated_text")) {
