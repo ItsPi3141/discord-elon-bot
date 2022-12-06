@@ -12,6 +12,17 @@ client.on("ready", () => {
 	client.user.setStatus("dnd");
 	setInterval(() => {
 		console.log(`Logged in as ${client.user.tag}!`);
+
+		// KEEP HUGGINGFACE MODEL ALIVE
+		var headers = {
+			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
+		};
+		fetch(API_URL, {
+			method: "post",
+			body: message.content.replace(".", ""),
+			headers: headers
+		});
+		api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
 	}, 20000);
 });
 
@@ -130,7 +141,7 @@ const greetings = [
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
 
-	if (message.content.startsWith(".")) {
+	if (message.content.startsWith(".") && message.content.length > 1) {
 		// form the request headers with Hugging Face API key
 		var headers = {
 			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
@@ -147,15 +158,13 @@ client.on("messageCreate", async (message) => {
 		const data = await response.json();
 		let botResponse = "";
 		if (data.hasOwnProperty("generated_text")) {
-			botResponse = data.generated_text;
+			botResponse = data.generated_text.replace(/&amp%?;/g, "and");
 		} else if (data.hasOwnProperty("error")) {
 			// error condition
-			botResponse = "An error has occurred!";
+			botResponse = "An error has occurred! Please try again in 10 seconds.\n" + data.error;
 			// botResponse = data.error;
 		}
 		message.reply(botResponse);
-		console.log(config.huggingface_api_keys[api_rotation]);
-		console.log(api_rotation);
 		api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
 		return;
 	} else {
