@@ -3,23 +3,23 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 const config = require("./config.json");
 const fetch = require("node-fetch");
 
-const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-small-elon";
+const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-medium-elon";
 var api_rotation = 0;
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity("Twitter employees", { type: ActivityType.Watching });
 	client.user.setStatus("dnd");
-	setInterval(() => {
+	setInterval(async () => {
 		console.log(`Logged in as ${client.user.tag}!`);
 
 		// KEEP HUGGINGFACE MODEL ALIVE
 		var headers = {
 			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
 		};
-		fetch(API_URL, {
+		await fetch(API_URL, {
 			method: "post",
-			body: message.content.replace(".", ""),
+			body: "Hi there!",
 			headers: headers
 		});
 		api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
@@ -158,10 +158,13 @@ client.on("messageCreate", async (message) => {
 		const data = await response.json();
 		let botResponse = "";
 		if (data.hasOwnProperty("generated_text")) {
-			botResponse = data.generated_text.replace(/&amp%?;/g, "and");
+			botResponse = data.generated_text
+				.replace(/&amp%?;/g, "and")
+				.replace(/&gt%?;/g, ">")
+				.replace(/&lt%?;/g, "<");
 		} else if (data.hasOwnProperty("error")) {
 			// error condition
-			botResponse = "An error has occurred! Please try again in 10 seconds.\n" + data.error;
+			botResponse = "An error has occurred! Please try again in 20 seconds.\n";
 			// botResponse = data.error;
 		}
 		message.reply(botResponse);
