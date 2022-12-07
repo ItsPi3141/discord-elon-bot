@@ -53,6 +53,33 @@ client.on("interactionCreate", async (interaction) => {
 					]
 				});
 				break;
+
+			case "chat":
+				await interaction.deferReply();
+				var headers = {
+					Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
+				};
+				const response = await fetch(API_URL, {
+					method: "post",
+					body: interaction.options.getString("message").replace(".", ""),
+					headers: headers
+				});
+				const data = await response.json();
+				let botResponse = "";
+				if (data.hasOwnProperty("generated_text")) {
+					botResponse = data.generated_text
+						.replace(/&amp%?;/g, "and")
+						.replace(/&gt%?;/g, ">")
+						.replace(/&lt%?;/g, "<");
+				} else if (data.hasOwnProperty("error")) {
+					// error condition
+					botResponse = "An error has occurred! Please try again in 20 seconds.\n";
+					console.log(data.error);
+					// botResponse = data.error;
+				}
+				await interaction.editReply(botResponse);
+				api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
+				break;
 		}
 	}
 });

@@ -9,6 +9,18 @@ const commands = [
 	{
 		name: "info",
 		description: "Who am I?"
+	},
+	{
+		name: "chat",
+		description: "Talk to me (I'm an AI)",
+		options: [
+			{
+				name: "message",
+				description: "Enter a message",
+				type: 3, // STRING
+				required: true
+			}
+		]
 	}
 ];
 
