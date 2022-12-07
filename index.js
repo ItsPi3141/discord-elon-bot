@@ -150,15 +150,11 @@ client.on("messageCreate", async (message) => {
 		// set status to typing
 		message.channel.sendTyping();
 		// query the server
-		try {
-			const response = await fetch(API_URL, {
-				method: "post",
-				body: message.content.replace(".", ""),
-				headers: headers
-			});
-		} catch {
-			console.log("An error occurred");
-		}
+		const response = await fetch(API_URL, {
+			method: "post",
+			body: message.content.replace(".", ""),
+			headers: headers
+		});
 		const data = await response.json();
 		let botResponse = "";
 		if (data.hasOwnProperty("generated_text")) {
@@ -169,6 +165,7 @@ client.on("messageCreate", async (message) => {
 		} else if (data.hasOwnProperty("error")) {
 			// error condition
 			botResponse = "An error has occurred! Please try again in 20 seconds.\n";
+			console.log(data.error);
 			// botResponse = data.error;
 		}
 		message.reply(botResponse);
@@ -209,19 +206,19 @@ client.on("messageCreate", async (message) => {
 client.login(config.token);
 
 // please do not crash my bot so it does not crash the bot so it does not crash the bot so it does not crash the bot so it does not crash the bot so it does not crash the bot
-process.on("unhandledRejection", (reason, p) => {
-	// console.log(" [Error_Handling] :: Unhandled Rejection/Catch");
-	// console.log(reason, p);
-});
-process.on("uncaughtException", (err, origin) => {
-	// console.log(" [Error_Handling] :: Uncaught Exception/Catch");
-	// console.log(err, origin);
-});
-process.on("uncaughtExceptionMonitor", (err, origin) => {
-	// console.log(" [Error_Handling] :: Uncaught Exception/Catch (MONITOR)");
-	// console.log(err, origin);
-});
-process.on("multipleResolves", (type, promise, reason) => {
-	// console.log(" [Error_Handling] :: Multiple Resolves");
-	// console.log(type, promise, reason);
-});
+// process.on("unhandledRejection", (reason, p) => {
+// 	// console.log(" [Error_Handling] :: Unhandled Rejection/Catch");
+// 	// console.log(reason, p);
+// });
+// process.on("uncaughtException", (err, origin) => {
+// 	// console.log(" [Error_Handling] :: Uncaught Exception/Catch");
+// 	// console.log(err, origin);
+// });
+// process.on("uncaughtExceptionMonitor", (err, origin) => {
+// 	// console.log(" [Error_Handling] :: Uncaught Exception/Catch (MONITOR)");
+// 	// console.log(err, origin);
+// });
+// process.on("multipleResolves", (type, promise, reason) => {
+// 	// console.log(" [Error_Handling] :: Multiple Resolves");
+// 	// console.log(type, promise, reason);
+// });
