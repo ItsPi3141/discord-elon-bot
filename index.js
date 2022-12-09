@@ -3,8 +3,19 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 const config = require("./config.json");
 const fetch = require("node-fetch");
 
-const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-medium-elon-2";
+const API_URL = "https://api-inference.huggingface.co/models/Pi3141/DialoGPT-medium-elon-3";
+// const API_URL = "https://api-inference.huggingface.co/models/luca-martial/DialoGPT-Elon";
 var api_rotation = 0;
+
+function randomString(length) {
+	var result = "";
+	var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	var charactersLength = characters.length;
+	for (var i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -17,13 +28,18 @@ client.on("ready", () => {
 		var headers = {
 			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
 		};
-		await fetch(API_URL, {
-			method: "post",
-			body: "Hi there!",
-			headers: headers
-		});
+		console.log("Fetching API to keep it alive...");
+
+		var data = await (
+			await fetch(API_URL, {
+				method: "post",
+				body: randomString(5),
+				headers: headers
+			})
+		).json();
+		console.log(data.generated_text);
 		api_rotation = (api_rotation + 1) % config.huggingface_api_keys.length;
-	}, 20000);
+	}, 10000);
 });
 
 // HANDLE SLASH COMMANDS
@@ -168,7 +184,7 @@ const greetings = [
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
 
-	if (message.content.startsWith(".") && message.content.length > 1) {
+	if ((message.content.startsWith(".") || message.content.startsWith(`<@${client.user.id}>`)) && message.content.length > 1) {
 		// form the request headers with Hugging Face API key
 		var headers = {
 			Authorization: "Bearer " + config.huggingface_api_keys[api_rotation]
@@ -179,7 +195,7 @@ client.on("messageCreate", async (message) => {
 		// query the server
 		const response = await fetch(API_URL, {
 			method: "post",
-			body: message.content.replace(".", ""),
+			body: message.content.replace(".", "").replace(`<@${client.user.id}>`, ""),
 			headers: headers
 		});
 		const data = await response.json();
@@ -233,19 +249,19 @@ client.on("messageCreate", async (message) => {
 client.login(config.token);
 
 // please do not crash my bot so it does not crash the bot so it does not crash the bot so it does not crash the bot so it does not crash the bot so it does not crash the bot
-// process.on("unhandledRejection", (reason, p) => {
-// 	// console.log(" [Error_Handling] :: Unhandled Rejection/Catch");
-// 	// console.log(reason, p);
-// });
-// process.on("uncaughtException", (err, origin) => {
-// 	// console.log(" [Error_Handling] :: Uncaught Exception/Catch");
-// 	// console.log(err, origin);
-// });
-// process.on("uncaughtExceptionMonitor", (err, origin) => {
-// 	// console.log(" [Error_Handling] :: Uncaught Exception/Catch (MONITOR)");
-// 	// console.log(err, origin);
-// });
-// process.on("multipleResolves", (type, promise, reason) => {
-// 	// console.log(" [Error_Handling] :: Multiple Resolves");
-// 	// console.log(type, promise, reason);
-// });
+process.on("unhandledRejection", (reason, p) => {
+	// console.log(" [Error_Handling] :: Unhandled Rejection/Catch");
+	// console.log(reason, p);
+});
+process.on("uncaughtException", (err, origin) => {
+	// console.log(" [Error_Handling] :: Uncaught Exception/Catch");
+	// console.log(err, origin);
+});
+process.on("uncaughtExceptionMonitor", (err, origin) => {
+	// console.log(" [Error_Handling] :: Uncaught Exception/Catch (MONITOR)");
+	// console.log(err, origin);
+});
+process.on("multipleResolves", (type, promise, reason) => {
+	// console.log(" [Error_Handling] :: Multiple Resolves");
+	// console.log(type, promise, reason);
+});
