@@ -220,25 +220,25 @@ client.on("messageCreate", async (message) => {
 			return;
 		}
 		if (message.mentions.users.has(client.user.id)) {
-			if (Math.random() <= 0.85) {
+			if (Math.random() <= 0.4) {
 				await message.reply(talkback_replies[Math.floor(Math.random() * talkback_replies.length)]);
 			}
 			return;
 		}
 		if (message.content.toLowerCase().includes("twitter")) {
-			if (Math.random() <= 0.7) {
+			if (Math.random() <= 0.6) {
 				if (Math.random() <= 0.7) {
 					await message.reply(twitter_replies[Math.floor(Math.random() * twitter_replies.length)]);
 					return;
 				}
 			} else {
-				if (Math.random() <= 0.7) {
+				if (Math.random() <= 0.3) {
 					await message.reply(replies[Math.floor(Math.random() * replies.length)]);
 					return;
 				}
 			}
 		} else {
-			if (Math.random() <= 0.1) {
+			if (Math.random() <= 0.05) {
 				await message.reply(replies[Math.floor(Math.random() * replies.length)]);
 				return;
 			}
